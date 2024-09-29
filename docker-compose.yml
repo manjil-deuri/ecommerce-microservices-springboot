@@ -1,0 +1,23 @@
+version: '3'
+services:
+  serviceregistry:
+    image: 'manjildeuri/serviceregistry:0.0.1'
+    container_name: 'serviceregistry'
+    ports:
+      - '8761:8761'
+    healthcheck:
+      test: [ "CMD","curl","-f","http://serviceregistry:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  configserver:
+    image: 'manjildeuri/configserver:0.0.1'
+    container_name: 'configserver'
+    ports:
+      - '9296:9296'
+    depends_on:
+      serviceregistry:
+        condition: service_healthy
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://host.docker.internal:8761/eureka
+
